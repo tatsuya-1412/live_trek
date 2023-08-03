@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:live_trek/live_list_detail.dart';
 import 'package:live_trek/model/live.dart';
 
 class LiveListItem extends StatelessWidget {
@@ -21,6 +22,13 @@ class LiveListItem extends StatelessWidget {
         title: Text(live!.name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         subtitle: Text(live!.date),
         trailing: const Icon(Icons.navigate_next),
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (BuildContext context) =>  LiveListDetail(live: live),
+            )
+          );
+        },
       );
     } else {
       return const ListTile(title: Text('...'));
