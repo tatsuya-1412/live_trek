@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:live_trek/live_list_create.dart';
 import 'package:live_trek/live_list_item.dart';
 import 'package:live_trek/model/live.dart';
+import 'package:provider/provider.dart';
 
 class LiveList extends StatefulWidget {
   const LiveList({super.key});
@@ -39,12 +40,32 @@ class _LiveListState extends State<LiveList> {
           ),
         ),
         Expanded(
-          child: ListView.builder(
-            padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-            itemCount: 3,
-            itemBuilder: (context, index) {
-              return LiveListItem(live: lives[index],);
-            }
+          child: Consumer<LiveNotifier>(
+            builder: (context, lives, child) {
+              if (lives.lives.isEmpty) {
+                return const Text('no data');
+              } else {
+                return ListView.builder(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 4, horizontal: 8),
+                    itemCount: lives.lives.length,
+                    itemBuilder: (context, index) {
+                      return Dismissible(
+                        key: UniqueKey(),
+                        child: LiveListItem(live: lives.lives[index]),
+                        onDismissed: (direction) {
+                          setState(() {
+                            lives.delete(lives.lives[index].id);
+                          });
+                        },
+                        background: Container(
+                          color: Colors.red,
+                        ),
+                      );
+                    }
+                );
+              }
+            },
           ),
         ),
       ],

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:live_trek/model/live.dart';
 import 'package:gap/gap.dart';
-import 'package:live_trek/setli_list.dart';
+import 'package:live_trek/setlist_list.dart';
 
 class LiveListDetail extends StatefulWidget {
   const LiveListDetail({super.key, required this.live});
@@ -11,7 +11,16 @@ class LiveListDetail extends StatefulWidget {
 }
 
 class _LiveListDetailState extends State<LiveListDetail> {
-  String memoText = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+  String memoText = '';
+
+  String getDate(DateTime datetime) {
+    return "${datetime.year}-${datetime.month}-${datetime.day}";
+  }
+
+  String getTime(DateTime datetime) {
+    return "${datetime.hour}:${datetime.minute}";
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -57,19 +66,29 @@ class _LiveListDetailState extends State<LiveListDetail> {
                     ),
                   ),
                   Container(
-                    padding: const EdgeInsets.all(32),
+                    padding: const EdgeInsets.all(20),
                     child: Column(
                       children: [
                         Text(
-                          widget.live!.name,
-                          style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                          widget.live!.title,
+                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                         ),
                         const Gap(20),
                         Row(
                           children: [
+                            const Icon(Icons.person),
+                            Text(
+                              widget.live!.artist,
+                              style: TextStyle(fontSize: 18),
+                            ),
+                          ],
+                        ),
+                        const Gap(10),
+                        Row(
+                          children: [
                             const Icon(Icons.date_range),
                             Text(
-                              widget.live!.date,
+                              getDate(widget.live!.performanceDate),
                               style: TextStyle(fontSize: 18),
                             ),
                           ],
@@ -79,7 +98,7 @@ class _LiveListDetailState extends State<LiveListDetail> {
                           children: [
                             const Icon(Icons.location_on),
                             Text(
-                              widget.live!.location,
+                              widget.live!.venue,
                               style: const TextStyle(fontSize: 16),
                             ),
                           ],
@@ -89,7 +108,7 @@ class _LiveListDetailState extends State<LiveListDetail> {
                           children: [
                             const Icon(Icons.access_time_outlined),
                             Text(
-                              '13:00',
+                              getTime(widget.live!.openTime),
                               style: const TextStyle(fontSize: 16),
                             ),
                           ],
@@ -99,7 +118,7 @@ class _LiveListDetailState extends State<LiveListDetail> {
                           children: [
                             const Icon(Icons.access_time_outlined),
                             Text(
-                              '15:00',
+                              getTime(widget.live!.startTime),
                               style: const TextStyle(fontSize: 16),
                             ),
                           ],
@@ -134,7 +153,7 @@ class _LiveListDetailState extends State<LiveListDetail> {
                           onPressed: () {
                             Navigator.of(context).push(
                               MaterialPageRoute(
-                                builder: (BuildContext context) => SetliList(setli: widget.live!.setli),
+                                builder: (BuildContext context) => SetlistList(liveId: widget.live!.id),
                               )
                             );
                           },

@@ -1,8 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:live_trek/live_list.dart';
+import 'package:live_trek/model/live.dart';
+import 'package:live_trek/model/setlist.dart';
+import 'package:provider/provider.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // final SharedPreferences pref = await SharedPreferences.getInstance();
+  final liveNotifier = LiveNotifier();
+  final setlistNotifier = SetlistNotifier();
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider<LiveNotifier>(
+          create: (context) => liveNotifier,
+        ),
+        ChangeNotifierProvider<SetlistNotifier>(
+          create: (context) => setlistNotifier,
+        ),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

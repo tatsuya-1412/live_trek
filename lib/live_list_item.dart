@@ -19,8 +19,8 @@ class LiveListItem extends StatelessWidget {
               )
           ),
         ),
-        title: Text(live!.name, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-        subtitle: Text(live!.date),
+        title: Text(live!.title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        subtitle: Text(live!.artist),
         trailing: const Icon(Icons.navigate_next),
         onTap: () {
           Navigator.of(context).push(
