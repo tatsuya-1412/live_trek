@@ -5,16 +5,17 @@ class SetlistNotifier extends ChangeNotifier {
   final List<Setlist> _setlists = [];
 
   List<Setlist> get setlists => _setlists;
+  final dbHelper = SetlistDatabaseHelper.instance;
 
   SetlistNotifier() {
     syncDb();
   }
 
   void syncDb() async {
-    SetlistDb.read().then(
-          (val) => _setlists
-        ..clear()
-        ..addAll(val),
+    dbHelper.read().then(
+      (val) => _setlists
+      ..clear()
+      ..addAll(val),
     );
     notifyListeners();
   }
@@ -27,7 +28,7 @@ class SetlistNotifier extends ChangeNotifier {
     }
   }
 
-  bool isExist(int id) {
+  bool isExist(String id) {
     if (_setlists.indexWhere((live) => live.id == id) < 0) {
       return false;
     }
@@ -35,23 +36,26 @@ class SetlistNotifier extends ChangeNotifier {
   }
 
   void add(Setlist setlist) async {
-    await SetlistDb.insert(setlist);
+    await dbHelper.insert(setlist);
     syncDb();
   }
 
-  void delete(int id) async {
-    await SetlistDb.delete(id);
+  void delete(String id) async {
+    await dbHelper.delete(id);
     syncDb();
   }
 
-  Future<List<Setlist>> getByLiveId(int id) async {
-    return _setlists.where((setlist) => setlist.liveId == id).toList();
+  List<Setlist> getByLiveId(String id) {
+    return _setlists
+      .where((setlist) => setlist.liveId == id)
+      .toList()
+      ..sort((a, b) => a.songOrder.compareTo(b.songOrder));
   }
 }
 
 class Setlist {
-  final int id;
-  final int liveId;
+  final String id;
+  final String liveId;
   final int songOrder;
   final String songTitle;
   final String artistName;

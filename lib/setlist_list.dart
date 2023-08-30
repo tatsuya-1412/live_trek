@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:live_trek/model/setlist.dart';
+import 'package:live_trek/setlist_edit.dart';
 import 'package:provider/provider.dart';
 
 class SetlistList extends StatefulWidget {
@@ -20,49 +21,62 @@ class _SetlistListState extends State<SetlistList> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<SetlistNotifier>(
-      builder: (context, setlists, child) => Scaffold(
-        body: SafeArea(
-          child: Column(
-            children: [
-              Container(
-                height: 42,
-                alignment: Alignment.topRight,
-                decoration: const BoxDecoration(
-                  border: Border(
-                    bottom: BorderSide(
-                      color: Colors.grey,
-                      width: 2,
-                    ),
+    return Scaffold(
+      body: SafeArea(
+        child: Column(
+          children: [
+            Container(
+              height: 42,
+              alignment: Alignment.topRight,
+              decoration: const BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: Colors.grey,
+                    width: 2,
                   ),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.arrow_back_ios_new),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.more_horiz),
-                      onPressed: () {},
-                    ),
-                  ],
-                ),
               ),
-              Expanded(
-                child: ListView.builder(
-                    padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                    itemCount: 3,
-                    itemBuilder: (context, index) {
-                      return SetliListItem(index: (index+1).toString(), songTitle: setlists.setlists[index].songTitle);
-                    }
-                ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back_ios_new),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.edit_note),
+                    onPressed: () {
+                      Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (BuildContext context) => SetlistEdit(liveId: widget.liveId),
+                          )
+                      );
+                    },
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+            Expanded(
+              child: Consumer<SetlistNotifier>(
+                builder: (context, setlists, child) {
+                  List<Setlist> setlistsByLiveId = setlists.getByLiveId(widget.liveId);
+                  return setlistsByLiveId.isEmpty
+                      ? Text('no data')
+                      : ListView.builder(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 4, horizontal: 8),
+                      itemCount: setlistsByLiveId.length,
+                      itemBuilder: (context, index) {
+                        return SetliListItem(index: (index + 1).toString(),
+                            songTitle: setlistsByLiveId[index].songTitle);
+                      }
+                  );
+                }
+              ),
+            ),
+          ],
         ),
       ),
     );
