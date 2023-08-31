@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  // databaseFactory = databaseFactoryFfiWeb;
   // final SharedPreferences pref = await SharedPreferences.getInstance();
   final liveNotifier = LiveNotifier();
   final setlistNotifier = SetlistNotifier();

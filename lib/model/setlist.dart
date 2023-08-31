@@ -12,7 +12,7 @@ class SetlistNotifier extends ChangeNotifier {
   }
 
   void syncDb() async {
-    dbHelper.read().then(
+    await dbHelper.read().then(
       (val) => _setlists
       ..clear()
       ..addAll(val),

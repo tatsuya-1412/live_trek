@@ -12,7 +12,7 @@ class LiveNotifier extends ChangeNotifier {
   }
 
   void syncDb() async {
-    dbHelper.read().then(
+    await dbHelper.read().then(
       (val) => _lives
       ..clear()
       ..addAll(val),
