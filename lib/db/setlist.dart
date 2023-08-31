@@ -31,6 +31,7 @@ class SetlistDatabaseHelper {
     // 取得パスを基に、データベースのパスを生成
     String path = join(documentsDirectory.path, setlistTableName);
     // データベース接続
+    // await deleteDatabase(path);
     return await openDatabase(path,
         version: _databaseVersion,
         // テーブル作成メソッドの呼び出し
@@ -84,7 +85,6 @@ class SetlistDatabaseHelper {
       where: 'id = ?',
       whereArgs: [setlist.id],
     );
-    db.close();
   }
 
   Future<void> delete(String id) async {

@@ -12,12 +12,12 @@ class SetlistList extends StatefulWidget {
 }
 
 class _SetlistListState extends State<SetlistList> {
-  List<Setlist> setlists = [];
+  List<Setlist> setlistsByLiveId = [];
 
-  // @override
-  // void initState() {
-  //   setlists = getByLiveId(widget.liveId);
-  // }
+  @override
+  void initState() {
+    setlistsByLiveId = Provider.of<SetlistNotifier>(context, listen: false).getByLiveId(widget.liveId);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +50,7 @@ class _SetlistListState extends State<SetlistList> {
                     onPressed: () {
                       Navigator.of(context).push(
                           MaterialPageRoute(
-                            builder: (BuildContext context) => SetlistEdit(liveId: widget.liveId),
+                            builder: (BuildContext context) => SetlistEdit(liveId: widget.liveId, setlistsByLiveId: setlistsByLiveId),
                           )
                       );
                     },
@@ -61,7 +61,7 @@ class _SetlistListState extends State<SetlistList> {
             Expanded(
               child: Consumer<SetlistNotifier>(
                 builder: (context, setlists, child) {
-                  List<Setlist> setlistsByLiveId = setlists.getByLiveId(widget.liveId);
+                  setlistsByLiveId = setlists.getByLiveId(widget.liveId);
                   return setlistsByLiveId.isEmpty
                       ? Text('no data')
                       : ListView.builder(

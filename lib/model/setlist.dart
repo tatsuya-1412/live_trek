@@ -40,6 +40,11 @@ class SetlistNotifier extends ChangeNotifier {
     syncDb();
   }
 
+  void update(Setlist setlist) async {
+    await dbHelper.update(setlist);
+    syncDb();
+  }
+
   void delete(String id) async {
     await dbHelper.delete(id);
     syncDb();
@@ -50,6 +55,13 @@ class SetlistNotifier extends ChangeNotifier {
       .where((setlist) => setlist.liveId == id)
       .toList()
       ..sort((a, b) => a.songOrder.compareTo(b.songOrder));
+  }
+
+  bool isExistByLiveId(String id, int order) {
+    if (_setlists.indexWhere((setlist) => setlist.id == id && setlist.songOrder == order) < 0) {
+      return false;
+    }
+    return true;
   }
 }
 

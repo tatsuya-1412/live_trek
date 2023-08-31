@@ -1,3 +1,5 @@
+// import 'dart:html';
+
 import 'package:flutter/material.dart';
 import 'package:gap/gap.dart';
 import 'package:live_trek/model/setlist.dart';
@@ -5,8 +7,9 @@ import 'package:provider/provider.dart';
 import 'package:uuid/uuid.dart';
 
 class SetlistEdit extends StatefulWidget {
-  const SetlistEdit({super.key, required this.liveId});
+  const SetlistEdit({super.key, required this.liveId, required this.setlistsByLiveId});
   final String liveId;
+  final List<Setlist> setlistsByLiveId;
   @override
   State<SetlistEdit> createState() => _SetlistEditState();
 }
@@ -18,14 +21,18 @@ class _SetlistEditState extends State<SetlistEdit> {
 
   void add() {
     setState(() {
-      inputFrameCount += 1;
       setlistItems.add(SetlistItem.create(inputFrameCount, "", ""));
+      print(inputFrameCount);
+      inputFrameCount += 1;
     });
   }
 
   @override
   void initState() {
-    setlistItems.add(SetlistItem.create(inputFrameCount, "", ""));
+    for (var item in widget.setlistsByLiveId) {
+      setlistItems.add(SetlistItem.create(inputFrameCount, item.songTitle, item.artistName));
+      inputFrameCount += 1;
+    }
   }
 
   @override
@@ -56,16 +63,45 @@ class _SetlistEditState extends State<SetlistEdit> {
                       },
                     ),
                     IconButton(
-                      icon: const Icon(Icons.more_horiz),
-                      onPressed: () {},
+                      icon: const Icon(Icons.save_as_outlined),
+                      onPressed: () {
+                        for (var item in setlistItems) {
+                          if (widget.setlistsByLiveId.any((element) => element.songOrder == item.order)) {
+                            setlists.update(
+                                Setlist(
+                                    id: widget.setlistsByLiveId.firstWhere((element) => element.songOrder == item.order).id,
+                                    liveId: widget.liveId,
+                                    songOrder: item.order,
+                                    songTitle: item.songController.text,
+                                    artistName: item.artistController.text,
+                                    notes: ""
+                                )
+                            );
+                          } else {
+                            var uuid = Uuid();
+                            setlists.add(
+                                Setlist(
+                                    id: uuid.v4(),
+                                    liveId: widget.liveId,
+                                    songOrder: item.order,
+                                    songTitle: item.songController.text,
+                                    artistName: item.artistController.text,
+                                    notes: ""
+                                )
+                            );
+                          }
+                        }
+                        Navigator.pop(context);
+                      },
                     ),
                   ],
                 ),
               ),
               Expanded(
-                child: Column(
-                  children: [
-                    Container(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Container(
                         padding: const EdgeInsets.all(10),
                         child: Column(
                           children: [
@@ -105,65 +141,22 @@ class _SetlistEditState extends State<SetlistEdit> {
                               ],
                             ),
                             const Gap(20),
-                            // Row(
-                            //   children: const [
-                            //     Expanded(
-                            //       flex: 4,
-                            //       child: TextField(
-                            //         decoration: InputDecoration(
-                            //           // labelText: 'TextField 1',
-                            //           contentPadding: EdgeInsets.all(10),
-                            //           border: OutlineInputBorder(
-                            //             borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                            //           ),
-                            //         ),
-                            //       ),
-                            //     ),
-                            //     SizedBox(width: 5), // 適宜スペーシングを調整
-                            //     Expanded(
-                            //       flex: 3,
-                            //       child: TextField(
-                            //         decoration: InputDecoration(
-                            //           // labelText: 'TextField 2',
-                            //           contentPadding: EdgeInsets.all(10),
-                            //           border: OutlineInputBorder(
-                            //             borderRadius: BorderRadius.all(Radius.circular(10.0)),
-                            //           ),
-                            //         ),
-                            //       ),
-                            //     ),
-                            //   ],
-                            // ),
-                            // const Gap(10),
                             ...setlistItems.map((item) => SetlistFieldItem(item)),
                             ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.grey, // foreground
+                              ),
                               onPressed: () {
                                 add();
                               },
-                              child: Text('入力枠の追加'),
-                            ),
-                            ElevatedButton(
-                              onPressed: () {
-                                for (var item in setlistItems) {
-                                  var uuid = Uuid();
-                                  setlists.add(
-                                    Setlist(
-                                      id: uuid.v4(),
-                                      liveId: widget.liveId,
-                                      songOrder: item.order,
-                                      songTitle: item.songController.text,
-                                      artistName: item.artistController.text,
-                                      notes: "aaa"
-                                    )
-                                  );
-                                }},
-                              child: Text('保存'),
+                              child: const Text('more'),
                             ),
                           ],
                         )
-                    ),
-                  ],
-                )
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),
@@ -197,19 +190,6 @@ class _SetlistEditState extends State<SetlistEdit> {
               flex: 3,
               child: TextField(
                 controller: setlistItem.artistController,
-                // onChanged: (text) {
-                //   var uuid = Uuid();
-                //   setlists.add(
-                //     Setlist(
-                //       id: uuid.v4(),
-                //       liveId: liveId,
-                //       songOrder: songOrder,
-                //       songTitle: songTitle,
-                //       artistName: artistName,
-                //       notes: ""
-                //     )
-                //   );
-                // },
                 decoration: const InputDecoration(
                   // labelText: 'TextField 2',
                   contentPadding: EdgeInsets.all(10),
@@ -227,44 +207,44 @@ class _SetlistEditState extends State<SetlistEdit> {
   }
 }
 
-class SetlistFieldItem extends StatelessWidget {
-  final SetlistItem setlistItem;
-
-  SetlistFieldItem({required this.setlistItem});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: const [
-        Expanded(
-          flex: 4,
-          child: TextField(
-            decoration: InputDecoration(
-              // labelText: 'TextField 1',
-              contentPadding: EdgeInsets.all(10),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10.0)),
-              ),
-            ),
-          ),
-        ),
-        SizedBox(width: 5), // 適宜スペーシングを調整
-        Expanded(
-          flex: 3,
-          child: TextField(
-            decoration: InputDecoration(
-              // labelText: 'TextField 2',
-              contentPadding: EdgeInsets.all(10),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.all(Radius.circular(10.0)),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
+// class SetlistFieldItem extends StatelessWidget {
+//   final SetlistItem setlistItem;
+//
+//   SetlistFieldItem({required this.setlistItem});
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Row(
+//       children: const [
+//         Expanded(
+//           flex: 4,
+//           child: TextField(
+//             decoration: InputDecoration(
+//               // labelText: 'TextField 1',
+//               contentPadding: EdgeInsets.all(10),
+//               border: OutlineInputBorder(
+//                 borderRadius: BorderRadius.all(Radius.circular(10.0)),
+//               ),
+//             ),
+//           ),
+//         ),
+//         SizedBox(width: 5), // 適宜スペーシングを調整
+//         Expanded(
+//           flex: 3,
+//           child: TextField(
+//             decoration: InputDecoration(
+//               // labelText: 'TextField 2',
+//               contentPadding: EdgeInsets.all(10),
+//               border: OutlineInputBorder(
+//                 borderRadius: BorderRadius.all(Radius.circular(10.0)),
+//               ),
+//             ),
+//           ),
+//         ),
+//       ],
+//     );
+//   }
+// }
 
 class SetlistItem {
   final int order;

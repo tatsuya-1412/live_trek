@@ -113,7 +113,6 @@ class LiveDatabaseHelper {
       where: 'id = ?',
       whereArgs: [live.id],
     );
-    db.close();
   }
 
   Future<void> delete(String id) async {
